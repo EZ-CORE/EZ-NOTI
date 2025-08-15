@@ -19,10 +19,24 @@ let firebaseInitialized = false;
 
 function initializeFirebase() {
   try {
-    const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH || 
-                               path.join(__dirname, '..', 'firebase-setup', 'service-account-key.json');
+    // Check if Firebase is already initialized
+    if (admin.apps.length > 0) {
+      firebaseInitialized = true;
+      console.log('✅ Firebase Admin SDK already initialized');
+      return;
+    }
+
+    let serviceAccount;
     
-    const serviceAccount = require(serviceAccountPath);
+    // For Vercel deployment, use environment variables
+    if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+    } else {
+      // For local development, use service account file
+      const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH || 
+                                 path.join(__dirname, '..', 'firebase-setup', 'service-account-key.json');
+      serviceAccount = require(serviceAccountPath);
+    }
     
     // Ensure project ID is explicitly set
     console.log('🔍 Service Account Project ID:', serviceAccount.project_id);
@@ -516,20 +530,25 @@ app.use((error, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log('🚀 Push Notification Server running on:');
-  console.log(`   http://localhost:${PORT}`);
-  console.log('');
-  console.log('📱 Features available:');
-  console.log('   • Single device notifications');
-  console.log('   • Bulk notifications');
-  console.log('   • Topic-based notifications');
-  console.log('   • Deep link support');
-  console.log('   • Testing interface');
-  console.log('');
-  if (!firebaseInitialized) {
-    console.log('⚠️  Warning: Firebase not initialized');
-    console.log('   Please configure your Firebase service account key');
-  }
-});
+// Start server (only for local development)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log('🚀 Push Notification Server running on:');
+    console.log(`   http://localhost:${PORT}`);
+    console.log('');
+    console.log('📱 Features available:');
+    console.log('   • Single device notifications');
+    console.log('   • Bulk notifications');
+    console.log('   • Topic-based notifications');
+    console.log('   • Deep link support');
+    console.log('   • Testing interface');
+    console.log('');
+    if (!firebaseInitialized) {
+      console.log('⚠️  Warning: Firebase not initialized');
+      console.log('   Please configure your Firebase service account key');
+    }
+  });
+}
+
+// Export the Express app for Vercel
+module.exports = app;

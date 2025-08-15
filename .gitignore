@@ -54,3 +54,4 @@ Thumbs.db
 
 # Firebase cache
 .firebase/
+.vercel

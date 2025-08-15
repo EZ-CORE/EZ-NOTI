@@ -1,0 +1,33 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables (local)
+.env
+.env.local
+.env.development
+.env.test
+
+# Firebase service account key (handled via environment variables in production)
+firebase-setup/service-account-key.json
+firebase-setup/service-account.json
+
+# Logs
+logs/
+*.log
+
+# Development files
+.DS_Store
+.vscode/
+.idea/
+
+# Documentation (optional, include if you want)
+mobile-integration/
+templates/
+QUICK-START.md
+
+# Git
+.git/
+.gitignore
